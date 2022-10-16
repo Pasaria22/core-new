@@ -1,23 +1,42 @@
 package com.example.demo.core;
 
+import com.example.demo.core.service.ShoeService;
 import com.example.demo.dto.in.ShoeFilter;
 import com.example.demo.dto.in.ShoeFilter.Color;
 import com.example.demo.dto.out.Shoe;
 import com.example.demo.dto.out.Shoes;
+import com.example.demo.dto.out.updated.NewShoe;
+import com.example.demo.dto.out.updated.Stock;
+
 import java.math.BigInteger;
 import java.util.List;
 
 @Implementation(version = 2)
 public class ShoeCoreNew extends AbstractShoeCore {
 
-  @Override
-  public Shoes search(final ShoeFilter filter) {
-    return Shoes.builder()
+
+    private final ShoeService shoeService;
+
+    public ShoeCoreNew(ShoeService shoeService) {
+        this.shoeService = shoeService;
+    }
+
+    @Override
+    public Shoes search(final ShoeFilter filter) {
+        return Shoes.builder()
                 .shoes(List.of(Shoe.builder()
-                                   .name("New shoe")
-                                   .color(filter.getColor().orElse(Color.BLACK))
-                                   .size(filter.getSize().orElse(BigInteger.TWO))
-                                   .build()))
+                        .name("New shoe")
+                        .color(filter.getColor().orElse(Color.BLACK))
+                        .size(filter.getSize().orElse(BigInteger.TWO))
+                        .build()))
                 .build();
-  }
+    }
+
+    @Override
+    public Stock findAllStock() {
+        List<NewShoe> allStock = shoeService.findAllStock();
+        return Stock.builder()
+                .state(shoeService.findState(allStock.size()))
+                .shoes(allStock).build();
+    }
 }
