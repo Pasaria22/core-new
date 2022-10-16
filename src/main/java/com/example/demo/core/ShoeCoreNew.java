@@ -10,6 +10,7 @@ import com.example.demo.dto.out.updated.Stock;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Implementation(version = 2)
 public class ShoeCoreNew extends AbstractShoeCore {
@@ -35,8 +36,9 @@ public class ShoeCoreNew extends AbstractShoeCore {
     @Override
     public Stock findAllStock() {
         List<NewShoe> allStock = shoeService.findAllStock();
+        Long size = allStock.stream().collect(Collectors.summingLong(NewShoe::getQuantity));
         return Stock.builder()
-                .state(shoeService.findState(allStock.size()))
+                .state(shoeService.findState(size))
                 .shoes(allStock).build();
     }
 }
