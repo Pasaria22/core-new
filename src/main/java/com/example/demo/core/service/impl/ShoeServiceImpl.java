@@ -5,8 +5,10 @@ import com.example.demo.core.repository.ShoeRepository;
 import com.example.demo.core.service.ShoeService;
 import com.example.demo.dto.enums.State;
 import com.example.demo.dto.in.ShoeFilter;
-import com.example.demo.dto.out.updated.NewShoe;
-import com.example.demo.dto.out.updated.ResultQueryDto;
+import com.example.demo.dto.in.ShoesIn;
+import com.example.demo.dto.out.v2.NewShoe;
+import com.example.demo.dto.out.v2.ResultQueryDto;
+import com.example.demo.entity.ShoeEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,5 +46,19 @@ public class ShoeServiceImpl implements ShoeService {
             return State.FULL;
         }
         return State.EMPTY;
+    }
+
+    @Override
+    public ShoesIn patchStock(ShoesIn shoesIn) {
+        long fields = shoeRepository.countAll();
+        if (shoesIn.getQuantity() < (30 - fields)) {
+            for (int i = 0; i < shoesIn.getQuantity(); i ++) {
+                shoeRepository.save(new ShoeEntity(shoesIn.getName(), shoesIn.getSize(), shoesIn.getColor()));
+            }
+        } else {
+            throw new RuntimeException("No es posible añadir más stock a la tienda");
+        }
+
+        return shoesIn;
     }
 }
